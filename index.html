@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FH Passkey Generator</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-card: rgba(15, 23, 42, 0.4);
+            --text-main: #ffffff;
+            --text-sub: rgba(255, 255, 255, 0.65);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --success: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #090d16;
+            color: var(--text-main);
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Background glowing orbs & mesh */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: 0;
+            pointer-events: none;
+            animation: floatOrb 12s ease-in-out infinite alternate;
+        }
+
+        .bg-orb-1 {
+            width: 380px;
+            height: 380px;
+            background: #4f46e5;
+            top: -100px;
+            left: -80px;
+            opacity: 0.5;
+        }
+
+        .bg-orb-2 {
+            width: 420px;
+            height: 420px;
+            background: #c026d3;
+            bottom: -120px;
+            right: -100px;
+            opacity: 0.45;
+        }
+
+        .bg-orb-3 {
+            width: 280px;
+            height: 280px;
+            background: #06b6d4;
+            top: 40%;
+            left: 60%;
+            transform: translate(-50%, -50%);
+            opacity: 0.35;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -40px) scale(1.1); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 40px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 16px;
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.25);
+            color: #fff;
+            font-size: 16px;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input[type="text"]:focus {
+            background: rgba(0, 0, 0, 0.4);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+            letter-spacing: normal;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button.submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.45);
+        }
+
+        button.submit-btn:active {
+            transform: translateY(0);
+        }
+
+        #result-container {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 16px;
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+        }
+
+        .result-value-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        #result-value {
+            font-size: 22px;
+            font-weight: 800;
+            font-family: monospace;
+            color: var(--success);
+            letter-spacing: 0.08em;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .explanation {
+            margin-top: 25px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--text-sub);
+            border-top: 1px solid var(--glass-border);
+            padding-top: 18px;
+        }
+
+        .explanation ol {
+            padding-left: 18px;
+            margin-top: 8px;
+        }
+
+        .explanation li {
+            margin-bottom: 4px;
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #e0e7ff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+
+    <div class="container">
+        <div class="header">
+            <span class="badge">FiberHome Tool</span>
+            <h1>FH Passkey Generator</h1>
+            <p class="subtitle">Hitung password default dari kode SSID tanpa mengetik <code>fh_</code></p>
+        </div>
+        
+        <form id="ssid-form">
+            <div class="form-group">
+                <label for="ssid">Kode SSID (6 Digit Hex)</label>
+                <div class="input-wrapper">
+                    <span class="input-prefix">fh_</span>
+                    <input type="text" id="ssid" placeholder="641b00" maxlength="10" required autocomplete="off">
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">
+                <span>Get Passkey</span>
+            </button>
+        </form>
+
+        <div id="result-container">
+            <div class="result-title">Password Default:</div>
+            <div class="result-value-wrapper">
+                <div id="result-value"></div>
+                <button type="button" class="copy-btn" id="copy-btn">Salin</button>
+            </div>
+        </div>
+
+        <div class="explanation">
+            <strong>Cara Kerja Algoritma:</strong>
+            <ol>
+                <li>Input otomatis mengabaikan prefix <code>fh_</code> dan suffix <code>_5G</code>.</li>
+                <li>Invert tiap digit hex (<code>hasil = 15 - n</code>).</li>
+                <li>Password default = <code>wlan</code> + hasil invert hex.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('ssid-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let rawInput = document.getElementById('ssid').value.trim();
+            
+            // Hapus _5G di akhir jika user memasukkannya
+            if (rawInput.endsWith('_5G')) {
+                rawInput = rawInput.substring(0, rawInput.length - 3);
+            }
+            
+            // Hapus prefix fh_ jika user tidak sengaja memasukkannya
+            if (rawInput.toLowerCase().startsWith('fh_')) {
+                rawInput = rawInput.substring(3);
+            }
+            
+            // Ambil 6 karakter hex pertama
+            let hexPart = rawInput.toLowerCase().substring(0, 6);
+            
+            if (hexPart.length !== 6 || !/^[0-9a-f]{6}$/.test(hexPart)) {
+                alert('Masukkan 6 digit hex SSID (contoh: 641b00)');
+                return;
+            }
+            
+            // Peta complement hex (15 - n)
+            const map = {
+                '0': 'f', '1': 'e', '2': 'd', '3': 'c',
+                '4': 'b', '5': 'a', '6': '9', '7': '8',
+                '8': '7', '9': '6', 'a': '5', 'b': '4',
+                'c': '3', 'd': '2', 'e': '1', 'f': '0'
+            };
+            
+            let inverted = '';
+            for (let char of hexPart) {
+                inverted += map[char] || char;
+            }
+            
+            const result = 'wlan' + inverted;
+            
+            const resultContainer = document.getElementById('result-container');
+            const resultValue = document.getElementById('result-value');
+            
+            resultValue.textContent = result;
+            resultContainer.style.display = 'block';
+        });
+
+        // Fitur Salin
+        document.getElementById('copy-btn').addEventListener('click', function() {
+            const val = document.getElementById('result-value').textContent;
+            navigator.clipboard.writeText(val).then(() => {
+                const origText = this.textContent;
+                this.textContent = 'Tersalin!';
+                setTimeout(() => {
+                    this.textContent = origText;
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
